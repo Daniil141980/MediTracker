@@ -1,6 +1,7 @@
 package com.example.meditracker.core
 
-import com.example.meditracker.data.api.UserApi
+import com.example.meditracker.data.api.UserAnalyzesApi
+import com.example.meditracker.data.api.UserAuthenticationApi
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -18,8 +19,20 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideUserApi(auth: FirebaseAuth, database: FirebaseFirestore): UserApi {
-        return UserApi(auth, database)
+    fun provideUserAnalyzesApi(
+        auth: FirebaseAuth,
+        database: FirebaseFirestore,
+    ): UserAnalyzesApi {
+        return UserAnalyzesApi(auth, database)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserAuthenticationApi(
+        auth: FirebaseAuth,
+        database: FirebaseFirestore,
+    ): UserAuthenticationApi {
+        return UserAuthenticationApi(auth, database)
     }
 
     @Provides

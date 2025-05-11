@@ -19,6 +19,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -31,6 +34,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -40,22 +44,43 @@ android {
     buildFeatures {
         compose = true
     }
+//    composeOptions {
+//        kotlinCompilerExtensionVersion = "1.5.1"
+//    }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
+    //navigation component
     implementation(libs.androidx.navigation.compose)
+    //viewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-
-    val hiltVersion = "2.50"
+    //di
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     kapt(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
-
-    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+    //firebase
+    implementation(platform(libs.firebase.bom))
+    //noinspection UseTomlInstead
     implementation("com.google.firebase:firebase-analytics")
+    //firebase auth
+    //noinspection UseTomlInstead
     implementation("com.google.firebase:firebase-auth")
+    //firebase firestore
+    //noinspection UseTomlInstead
     implementation("com.google.firebase:firebase-firestore")
+    //material DatePickerDialog
+    //noinspection UseTomlInstead
+    implementation("io.github.vanpra.compose-material-dialogs:core:0.9.0")
+    //noinspection UseTomlInstead
+    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
+    //noinspection UseTomlInstead
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -65,6 +90,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

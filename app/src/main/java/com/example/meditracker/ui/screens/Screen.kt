@@ -2,8 +2,15 @@ package com.example.meditracker.ui.screens
 
 sealed class Screen(val route: String) {
 
-    object SignInScreen : Screen("sign_in_screen")
-    object SignUpScreen : Screen("sign_up_screen")
-    object AnalysisScreen : Screen("analysis_screen")
+    data object SignInScreen : Screen("sign_in_screen")
+    data object SignUpScreen : Screen("sign_up_screen")
+    data object AnalysisScreen : Screen("analysis_screen")
+    data object AddAnalysisScreen : Screen("add_analysis_screen")
+    data object AppointmentScreen : Screen("appointment_screen")
+    data object DiaryScreen : Screen("diary_screen")
+    data object AddDiaryEntryScreen : Screen("add_diary_entry_screen")
+    data object AccountScreen : Screen("account_screen")
+    data object ChangePasswordScreen : Screen("change_password_screen")
+    data object SplashScreen : Screen("splash_screen")
 
 }
