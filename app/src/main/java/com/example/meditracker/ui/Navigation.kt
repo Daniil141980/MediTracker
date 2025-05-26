@@ -31,13 +31,21 @@ import com.example.meditracker.ui.screens.main.changePassword.ChangePasswordScre
 import com.example.meditracker.ui.screens.main.addAnalysis.AddAnalysisScreen
 import com.example.meditracker.ui.screens.main.addDiaryEntry.AddDiaryEntryScreen
 import com.example.meditracker.ui.screens.main.analysis.AnalysisScreen
+import com.example.meditracker.ui.screens.main.analysisDetails.AnalysisDetailsScreen
 import com.example.meditracker.ui.screens.main.diary.DiaryScreen
+import com.example.meditracker.ui.screens.main.diaryEntryDetails.DiaryEntryDetailsScreen
+import com.example.meditracker.ui.screens.main.editAnalysis.EditAnalysisScreen
+import com.example.meditracker.ui.screens.main.editDiaryEntry.EditDiaryEntryScreen
 import com.example.meditracker.ui.viewModels.AccountScreenViewModel
 import com.example.meditracker.ui.viewModels.AddAnalysisScreenViewModel
 import com.example.meditracker.ui.viewModels.AddDiaryEntryScreenViewModel
+import com.example.meditracker.ui.viewModels.AnalysisDetailsScreenViewModel
 import com.example.meditracker.ui.viewModels.AnalysisScreenViewModel
 import com.example.meditracker.ui.viewModels.ChangePasswordViewModel
+import com.example.meditracker.ui.viewModels.DiaryEntryDetailsScreenViewModel
 import com.example.meditracker.ui.viewModels.DiaryScreenViewModel
+import com.example.meditracker.ui.viewModels.EditAnalysisScreenViewModel
+import com.example.meditracker.ui.viewModels.EditDiaryEntryScreenViewModel
 import com.example.meditracker.ui.viewModels.SignInScreenViewModel
 import com.example.meditracker.ui.viewModels.SignUpScreenViewModel
 import com.example.meditracker.ui.viewModels.SplashScreenViewModel
@@ -52,9 +60,7 @@ object Navigation {
     private const val ACCOUNT_ROUTE = "accountRoute"
 
     @Composable
-    fun Navigation(
-        analysisScreenViewModel: AnalysisScreenViewModel = hiltViewModel()
-    ) {
+    fun Navigation() {
 
         val navController = rememberNavController()
 
@@ -73,7 +79,6 @@ object Navigation {
                     SplashScreen(
                         navController = navController,
                         viewModel = viewModel,
-                        analysisScreenViewModel = analysisScreenViewModel,
                     )
                 }
             }
@@ -88,7 +93,6 @@ object Navigation {
                     SignInScreen(
                         navController = navController,
                         viewModel = viewModel,
-                        analysisScreenViewModel = analysisScreenViewModel,
                     )
                 }
                 composable(
@@ -98,7 +102,6 @@ object Navigation {
                     SignUpScreen(
                         navController = navController,
                         viewModel = viewModel,
-                        analysisScreenViewModel = analysisScreenViewModel,
                     )
                 }
             }
@@ -106,7 +109,6 @@ object Navigation {
                 route = MAIN_ROUTE,
             ) {
                 BottomNavigation(
-                    analysisScreenViewModel = analysisScreenViewModel,
                     authNavController = navController,
                 )
             }
@@ -114,10 +116,13 @@ object Navigation {
     }
 
     @Composable
-    fun BottomNavigation(
-        analysisScreenViewModel: AnalysisScreenViewModel,
+    private fun BottomNavigation(
         authNavController: NavController,
     ) {
+
+        val analysisScreenViewModel = hiltViewModel<AnalysisScreenViewModel>()
+        val diaryScreenViewModel = hiltViewModel<DiaryScreenViewModel>()
+
         Surface {
             val bottomItems = listOf(
                 Screen.AnalysisScreen.route,
@@ -180,6 +185,25 @@ object Navigation {
                             AddAnalysisScreen(
                                 navController = bottomNavController,
                                 viewModel = viewModel,
+                                analysisScreenViewModel = analysisScreenViewModel,
+                            )
+                        }
+                        composable(
+                            route = Screen.AnalysisDetailsScreen.route,
+                        ) {
+                            val viewModel = hiltViewModel<AnalysisDetailsScreenViewModel>()
+                            AnalysisDetailsScreen(
+                                navController = bottomNavController,
+                                viewModel = viewModel,
+                            )
+                        }
+                        composable(
+                            route = Screen.EditAnalysisScreen.route,
+                        ) {
+                            val viewModel = hiltViewModel<EditAnalysisScreenViewModel>()
+                            EditAnalysisScreen(
+                                navController = bottomNavController,
+                                viewModel = viewModel,
                             )
                         }
                     }
@@ -190,10 +214,9 @@ object Navigation {
                         composable(
                             route = Screen.DiaryScreen.route,
                         ) {
-                            val viewModel = hiltViewModel<DiaryScreenViewModel>()
                             DiaryScreen(
                                 navController = bottomNavController,
-                                viewModel = viewModel,
+                                viewModel = diaryScreenViewModel,
                             )
                         }
                         composable(
@@ -201,6 +224,25 @@ object Navigation {
                         ) {
                             val viewModel = hiltViewModel<AddDiaryEntryScreenViewModel>()
                             AddDiaryEntryScreen(
+                                navController = bottomNavController,
+                                viewModel = viewModel,
+                                diaryScreenViewModel = diaryScreenViewModel,
+                            )
+                        }
+                        composable(
+                            route = Screen.DiaryEntryDetailsScreen.route,
+                        ) {
+                            val viewModel = hiltViewModel<DiaryEntryDetailsScreenViewModel>()
+                            DiaryEntryDetailsScreen(
+                                navController = bottomNavController,
+                                viewModel = viewModel,
+                            )
+                        }
+                        composable(
+                            route = Screen.EditDiaryEntryScreen.route,
+                        ) {
+                            val viewModel = hiltViewModel<EditDiaryEntryScreenViewModel>()
+                            EditDiaryEntryScreen(
                                 navController = bottomNavController,
                                 viewModel = viewModel,
                             )

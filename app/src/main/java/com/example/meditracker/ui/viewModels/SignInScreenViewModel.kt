@@ -5,23 +5,32 @@ import androidx.lifecycle.viewModelScope
 import com.example.meditracker.R
 import com.example.meditracker.core.ResultOfRequest
 import com.example.meditracker.data.api.UserAuthenticationApi
+import com.example.meditracker.data.repository.UserAnalyzesRepository
+import com.example.meditracker.data.repository.UserDiaryRepository
 import com.example.meditracker.ui.screens.login.signIn.SignInScreenUiState
+import com.example.meditracker.utils.LOADING_DATA_ERROR
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SignInScreenViewModel @Inject constructor(
-    private val userAuthenticationApi: UserAuthenticationApi
+    private val userAuthenticationApi: UserAuthenticationApi,
+    private val userAnalyzesRepository: UserAnalyzesRepository,
+    private val userDiaryRepository: UserDiaryRepository,
 ) : ViewModel() {
 
     private val _signInScreenUiState = MutableStateFlow(SignInScreenUiState())
     val signInScreenUiState = _signInScreenUiState.asStateFlow()
+
+    private val _resultOfLoadingData =
+        MutableStateFlow<ResultOfRequest<Unit>>(ResultOfRequest.Loading)
+    val resultOfLoadingData = _resultOfLoadingData.asStateFlow()
 
     private var signInJob: Job? = null
 
@@ -70,7 +79,31 @@ class SignInScreenViewModel @Inject constructor(
                 email = signInScreenUiState.value.email,
                 password = signInScreenUiState.value.password,
             )
-            _resultOfRequest.update { result }
+            _resultOfRequest.value = result
+        }
+    }
+
+    fun startLoadingUserData() {
+        viewModelScope.launch {
+            userAnalyzesRepository.loadUserAnalyzes()
+            userDiaryRepository.loadUserDiaryEntries()
+
+            combine(
+                userAnalyzesRepository.resultOfLoadingAnalyzes,
+                userDiaryRepository.resultOfLoadingDiaryEntries
+            ) { analyzesResult, diaryResult ->
+                when {
+                    analyzesResult is ResultOfRequest.Error -> ResultOfRequest.Error(analyzesResult.errorMessage)
+                    diaryResult is ResultOfRequest.Error -> ResultOfRequest.Error(diaryResult.errorMessage)
+                    analyzesResult is ResultOfRequest.Success && diaryResult is ResultOfRequest.Success -> ResultOfRequest.Success(
+                        Unit
+                    )
+
+                    else -> ResultOfRequest.Error(LOADING_DATA_ERROR)
+                }
+            }.collect { combinedResult ->
+                _resultOfLoadingData.value = combinedResult
+            }
         }
     }
 

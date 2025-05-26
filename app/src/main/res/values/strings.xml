@@ -60,4 +60,24 @@
     <string name="add_diary_entry">Добавить запись в дневник</string>
     <string name="input_heading">Введите заголовок</string>
     <string name="input_diary_entry">Введите запись</string>
+    <string name="detailed_description">Детальное описание</string>
+    <string name="name">Название</string>
+    <string name="unit">Единица измерения</string>
+    <string name="lowerLimit">Нижняя граница</string>
+    <string name="upperLimit">Верхняя граница</string>
+    <string name="date">Дата</string>
+    <string name="save">Сохранить</string>
+    <string name="icon_edit">Иконка редактирования</string>
+    <string name="icon_delete">Иконка удаления</string>
+    <string name="icon_warning">Иконка предупреждения</string>
+    <string name="warning">Предупреждения</string>
+    <string name="want_delete_analysis">Вы точно хотите удалить данный анализ?</string>
+    <string name="successful_deletion_analysis">Анализ успешно удален!</string>
+    <string name="yes">Да</string>
+    <string name="heading">Заголовок</string>
+    <string name="diary_entry">Запись</string>
+    <string name="want_delete_diary_entry">Вы точно хотите удалить данную запись?</string>
+    <string name="successful_deletion_diary_entry">Запись дневника успешно удалена!</string>
+    <string name="change_analysis">Изменить анализ</string>
+    <string name="change_diary_entry">Изменить запись дневника</string>
 </resources>

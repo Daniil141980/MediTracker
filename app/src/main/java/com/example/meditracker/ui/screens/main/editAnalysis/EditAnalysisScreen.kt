@@ -1,4 +1,4 @@
-package com.example.meditracker.ui.screens.main.addAnalysis
+package com.example.meditracker.ui.screens.main.editAnalysis
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -33,22 +33,19 @@ import com.example.meditracker.R
 import com.example.meditracker.core.ResultOfRequest
 import com.example.meditracker.ui.screens.Screen
 import com.example.meditracker.ui.screens.DateMaterialDialog
-import com.example.meditracker.ui.viewModels.AddAnalysisScreenViewModel
-import com.example.meditracker.ui.viewModels.AnalysisScreenViewModel
+import com.example.meditracker.ui.viewModels.EditAnalysisScreenViewModel
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 
 @Composable
-fun AddAnalysisScreen(
+fun EditAnalysisScreen(
     navController: NavController,
-    viewModel: AddAnalysisScreenViewModel,
-    analysisScreenViewModel: AnalysisScreenViewModel,
+    viewModel: EditAnalysisScreenViewModel,
 ) {
-
     val context = LocalContext.current
 
     val addAnalysisScreenUiState by viewModel.addAnalysisScreenUiState.collectAsState()
 
-    val resultOfRequest = viewModel.resultOfAddingAnalysis.collectAsState().value
+    val resultOfEditingAnalysis = viewModel.resultOfEditingAnalysis.collectAsState().value
 
     val dateDialogState = rememberMaterialDialogState()
 
@@ -63,7 +60,7 @@ fun AddAnalysisScreen(
                 .height(16.dp),
         )
         Text(
-            text = stringResource(id = R.string.add_analysis),
+            text = stringResource(id = R.string.change_analysis),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
         )
@@ -242,7 +239,7 @@ fun AddAnalysisScreen(
                     addAnalysisScreenUiState.lowerLimitErrorMessage == null &&
                     addAnalysisScreenUiState.upperLimitErrorMessage == null
                 ) {
-                    viewModel.addAnalysis(analysisScreenViewModel.getAnalyzesSize())
+                    viewModel.editAnalysis()
                 } else {
                     Toast.makeText(
                         context,
@@ -253,22 +250,22 @@ fun AddAnalysisScreen(
             },
         ) {
             Text(
-                text = stringResource(id = R.string.add),
+                text = stringResource(id = R.string.save),
             )
         }
     }
     DateMaterialDialog(dateDialogState = dateDialogState, updateData = viewModel::updateDate)
 
-    LaunchedEffect(resultOfRequest) {
-        when (resultOfRequest) {
+    LaunchedEffect(resultOfEditingAnalysis) {
+        when (resultOfEditingAnalysis) {
             is ResultOfRequest.Success<Unit> -> {
-                navController.navigate(Screen.AnalysisScreen.route)
+                navController.navigate(Screen.AnalysisDetailsScreen.route)
             }
 
             is ResultOfRequest.Error -> {
                 Toast.makeText(
                     context,
-                    resultOfRequest.errorMessage,
+                    resultOfEditingAnalysis.errorMessage,
                     Toast.LENGTH_SHORT
                 ).show()
             }

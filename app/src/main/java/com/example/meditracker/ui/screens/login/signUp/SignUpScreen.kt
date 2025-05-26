@@ -32,14 +32,12 @@ import com.example.meditracker.ui.Navigation
 import com.example.meditracker.R
 import com.example.meditracker.core.ResultOfRequest
 import com.example.meditracker.ui.screens.Screen
-import com.example.meditracker.ui.viewModels.AnalysisScreenViewModel
 import com.example.meditracker.ui.viewModels.SignUpScreenViewModel
 
 @Composable
 fun SignUpScreen(
     navController: NavController,
     viewModel: SignUpScreenViewModel,
-    analysisScreenViewModel: AnalysisScreenViewModel,
 ) {
     val context = LocalContext.current
 
@@ -225,7 +223,6 @@ fun SignUpScreen(
         LaunchedEffect(resultOfRequest) {
             when (resultOfRequest) {
                 is ResultOfRequest.Success -> {
-                    analysisScreenViewModel.loadAnalyzes()
                     navController.navigate(Navigation.MAIN_ROUTE) {
                         popUpTo(Navigation.AUTH_ROUTE)
                     }

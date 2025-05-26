@@ -2,33 +2,47 @@ package com.example.meditracker.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.meditracker.core.ResultOfRequest
-import com.example.meditracker.data.api.UserApi
-import com.example.meditracker.ui.screens.main.analysis.AnalysisUiState
-import com.example.meditracker.utils.USER_UNAUTHORIZED_ERROR_MESSAGE
+import com.example.meditracker.data.repository.UserAnalyzesRepository
+import com.example.meditracker.domain.model.Analysis
+import com.example.meditracker.presenter.AnalyzesProvider
 import com.example.meditracker.utils.toAnalyzesUiStateWithSort
+import com.example.meditracker.utils.toLocalDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AnalysisScreenViewModel @Inject constructor(
-    private val userApi: UserApi,
+    private val userAnalyzesRepository: UserAnalyzesRepository,
 ) : ViewModel() {
 
-    private val _resultOfLoadAnalyzes =
-        MutableStateFlow<ResultOfRequest<List<AnalysisUiState>>>(ResultOfRequest.Loading)
-    val resultOfLoadAnalyzes = _resultOfLoadAnalyzes.asStateFlow()
+    private val _analyzes = MutableStateFlow<List<Analysis>>(emptyList())
+    private val analyzes = _analyzes.asStateFlow()
 
-    fun loadAnalyzes() {
+    val analyzesUiState = analyzes.map { analyzes ->
+        analyzes.toAnalyzesUiStateWithSort()
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        emptyList(),
+    )
+
+    init {
         viewModelScope.launch {
-            userApi.getUserData { user ->
-                _resultOfLoadAnalyzes.value = user?.let {
-                    ResultOfRequest.Success(it.analyzes.toAnalyzesUiStateWithSort())
-                } ?: ResultOfRequest.Error(USER_UNAUTHORIZED_ERROR_MESSAGE)
+            userAnalyzesRepository.analyzes.collect { analyzes ->
+                _analyzes.value = analyzes.sortedByDescending { it.date.toLocalDate() }
             }
         }
     }
+
+    fun addAnalysisToPresenter(index: Int) {
+        AnalyzesProvider.setAnalysis(analyzes.value[index])
+    }
+
+    fun getAnalyzesSize() = analyzes.value.size
 }

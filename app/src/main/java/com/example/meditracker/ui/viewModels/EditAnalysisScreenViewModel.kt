@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.meditracker.R
 import com.example.meditracker.core.ResultOfRequest
 import com.example.meditracker.data.repository.UserAnalyzesRepository
+import com.example.meditracker.domain.model.Analysis
+import com.example.meditracker.presenter.AnalyzesProvider
 import com.example.meditracker.ui.screens.main.addAnalysis.AddAnalysisScreenUiState
 import com.example.meditracker.utils.toFormattedDate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,18 +18,42 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-class AddAnalysisScreenViewModel @Inject constructor(
+class EditAnalysisScreenViewModel @Inject constructor(
     private val userAnalyzesRepository: UserAnalyzesRepository,
 ) : ViewModel() {
 
     private val _addAnalysisScreenUiState = MutableStateFlow(AddAnalysisScreenUiState())
     val addAnalysisScreenUiState = _addAnalysisScreenUiState.asStateFlow()
 
-    private var addingAnalysisJob: Job? = null
+    private var editingAnalysisJob: Job? = null
 
-    private val _resultOfAddingAnalysis =
+    private val _analysis = MutableStateFlow(Analysis())
+    val analysis = _analysis.asStateFlow()
+
+    private val _resultOfEditingAnalysis =
         MutableStateFlow<ResultOfRequest<Unit>>(ResultOfRequest.Loading)
-    val resultOfAddingAnalysis = _resultOfAddingAnalysis.asStateFlow()
+    val resultOfEditingAnalysis = _resultOfEditingAnalysis.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            AnalyzesProvider.analysis.collect {
+                _analysis.value = it
+                _addAnalysisScreenUiState.value = AddAnalysisScreenUiState(
+                    name = analysis.value.name,
+                    unit = analysis.value.unit,
+                    result = analysis.value.result.toString(),
+                    lowerLimit = analysis.value.lowerLimit.toString(),
+                    upperLimit = analysis.value.upperLimit.toString(),
+                    formattedDate = analysis.value.date,
+                    nameErrorMessage = null,
+                    unitErrorMessage = null,
+                    resultErrorMessage = null,
+                    lowerLimitErrorMessage = null,
+                    upperLimitErrorMessage = null,
+                )
+            }
+        }
+    }
 
     fun updateName(name: String) {
         _addAnalysisScreenUiState.value = addAnalysisScreenUiState.value.copy(
@@ -116,18 +142,19 @@ class AddAnalysisScreenViewModel @Inject constructor(
         )
     }
 
-    fun addAnalysis(index: Int) {
-        addingAnalysisJob?.cancel()
-        val analysis = addAnalysisScreenUiState.value.toAnalysis().copy(
-            index = index,
+    fun editAnalysis() {
+        editingAnalysisJob?.cancel()
+        val updatedAnalysis = addAnalysisScreenUiState.value.toAnalysis().copy(
+            index = analysis.value.index,
         )
-        addingAnalysisJob = viewModelScope.launch {
-            userAnalyzesRepository.addAnalysis(analysis)
-            userAnalyzesRepository.resultOfAddingAnalysis.collect {
-                _resultOfAddingAnalysis.value = it
+        editingAnalysisJob = viewModelScope.launch {
+            userAnalyzesRepository.editAnalysis(updatedAnalysis)
+            userAnalyzesRepository.resultOfEditingAnalysis.collect {
+                _resultOfEditingAnalysis.value = it
+                if (it is ResultOfRequest.Success) {
+                    AnalyzesProvider.setAnalysis(updatedAnalysis)
+                }
             }
         }
     }
 }
-
-
