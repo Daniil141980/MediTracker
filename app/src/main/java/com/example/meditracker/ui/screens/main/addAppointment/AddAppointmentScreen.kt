@@ -1,4 +1,4 @@
-package com.example.meditracker.ui.screens.main.addAnalysis
+package com.example.meditracker.ui.screens.main.addAppointment
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,32 +24,33 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.meditracker.R
 import com.example.meditracker.core.ResultOfRequest
-import com.example.meditracker.ui.screens.Screen
 import com.example.meditracker.ui.screens.DateMaterialDialog
-import com.example.meditracker.ui.viewModels.AddAnalysisScreenViewModel
-import com.example.meditracker.ui.viewModels.AnalysisScreenViewModel
+import com.example.meditracker.ui.screens.Screen
+import com.example.meditracker.ui.screens.TimeMaterialDialog
+import com.example.meditracker.ui.viewModels.AddAppointmentViewModel
+import com.example.meditracker.ui.viewModels.AppointmentsScreenViewModel
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 
 @Composable
-fun AddAnalysisScreen(
+fun AddAppointmentScreen(
     navController: NavController,
-    viewModel: AddAnalysisScreenViewModel,
-    analysisScreenViewModel: AnalysisScreenViewModel,
+    viewModel: AddAppointmentViewModel,
+    appointmentViewModel: AppointmentsScreenViewModel,
 ) {
-
     val context = LocalContext.current
 
-    val addAnalysisScreenUiState by viewModel.addAnalysisScreenUiState.collectAsState()
+    val addAppointmentUiState by viewModel.addAppointmentScreenUiState.collectAsState()
 
-    val resultOfRequest = viewModel.resultOfAddingAnalysis.collectAsState().value
+    val resultOfRequest = viewModel.resultOfAddingAppointment.collectAsState().value
 
     val dateDialogState = rememberMaterialDialogState()
+
+    val timeDialogState = rememberMaterialDialogState()
 
     Column(
         modifier = Modifier
@@ -63,7 +63,7 @@ fun AddAnalysisScreen(
                 .height(16.dp),
         )
         Text(
-            text = stringResource(id = R.string.add_analysis),
+            text = stringResource(id = R.string.add_appointment),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
         )
@@ -74,21 +74,21 @@ fun AddAnalysisScreen(
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth(),
-            value = addAnalysisScreenUiState.name,
+            value = addAppointmentUiState.doctorSpecialty,
             maxLines = 1,
             singleLine = true,
             onValueChange = {
-                viewModel.updateName(name = it)
+                viewModel.updateDoctorSpecialty(doctorSpecialty = it)
             },
             label = {
                 Text(
-                    text = stringResource(id = R.string.input_analysis_name),
+                    text = stringResource(id = R.string.input_doctor_speciality),
                 )
             },
-            isError = addAnalysisScreenUiState.nameErrorMessage != null,
+            isError = addAppointmentUiState.doctorSpecialtyErrorMessage != null,
             supportingText = {
                 Text(
-                    text = addAnalysisScreenUiState.nameErrorMessage?.let {
+                    text = addAppointmentUiState.doctorSpecialtyErrorMessage?.let {
                         stringResource(id = it)
                     } ?: ""
                 )
@@ -101,21 +101,21 @@ fun AddAnalysisScreen(
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth(),
-            value = addAnalysisScreenUiState.unit,
+            value = addAppointmentUiState.doctorName,
             maxLines = 1,
             singleLine = true,
             onValueChange = {
-                viewModel.updateUnit(unit = it)
+                viewModel.updateDoctorName(doctorName = it)
             },
             label = {
                 Text(
-                    text = stringResource(id = R.string.input_analysis_unit),
+                    text = stringResource(id = R.string.input_doctor_name),
                 )
             },
-            isError = addAnalysisScreenUiState.unitErrorMessage != null,
+            isError = addAppointmentUiState.doctorNameErrorMessage != null,
             supportingText = {
                 Text(
-                    text = addAnalysisScreenUiState.unitErrorMessage?.let {
+                    text = addAppointmentUiState.doctorNameErrorMessage?.let {
                         stringResource(id = it)
                     } ?: ""
                 )
@@ -128,78 +128,21 @@ fun AddAnalysisScreen(
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth(),
-            value = addAnalysisScreenUiState.result,
+            value = addAppointmentUiState.address,
             maxLines = 1,
             singleLine = true,
             onValueChange = {
-                viewModel.updateResult(it)
+                viewModel.updateAddress(it)
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             label = {
                 Text(
-                    text = stringResource(id = R.string.input_analysis_result),
+                    text = stringResource(id = R.string.input_address),
                 )
             },
-            isError = addAnalysisScreenUiState.resultErrorMessage != null,
+            isError = addAppointmentUiState.addressErrorMessage != null,
             supportingText = {
                 Text(
-                    text = addAnalysisScreenUiState.resultErrorMessage?.let {
-                        stringResource(id = it)
-                    } ?: ""
-                )
-            },
-        )
-        Spacer(
-            modifier = Modifier
-                .height(8.dp),
-        )
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth(),
-            value = addAnalysisScreenUiState.lowerLimit,
-            maxLines = 1,
-            singleLine = true,
-            onValueChange = {
-                viewModel.updateLowerLimit(it)
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            label = {
-                Text(
-                    text = stringResource(id = R.string.input_analysis_lower_limit),
-                )
-            },
-            isError = addAnalysisScreenUiState.lowerLimitErrorMessage != null,
-            supportingText = {
-                Text(
-                    text = addAnalysisScreenUiState.lowerLimitErrorMessage?.let {
-                        stringResource(id = it)
-                    } ?: ""
-                )
-            },
-        )
-        Spacer(
-            modifier = Modifier
-                .height(8.dp),
-        )
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth(),
-            value = addAnalysisScreenUiState.upperLimit,
-            maxLines = 1,
-            singleLine = true,
-            onValueChange = {
-                viewModel.updateUpperLimit(it)
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            label = {
-                Text(
-                    text = stringResource(id = R.string.input_analysis_upper_limit),
-                )
-            },
-            isError = addAnalysisScreenUiState.upperLimitErrorMessage != null,
-            supportingText = {
-                Text(
-                    text = addAnalysisScreenUiState.upperLimitErrorMessage?.let {
+                    text = addAppointmentUiState.addressErrorMessage?.let {
                         stringResource(id = it)
                     } ?: ""
                 )
@@ -216,7 +159,7 @@ fun AddAnalysisScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = addAnalysisScreenUiState.formattedDate,
+                text = addAppointmentUiState.formattedDate,
                 fontSize = 20.sp,
             )
             IconButton(
@@ -232,17 +175,42 @@ fun AddAnalysisScreen(
                 )
             }
         }
+        Spacer(
+            modifier = Modifier
+                .height(8.dp),
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = addAppointmentUiState.formattedTime,
+                fontSize = 20.sp,
+            )
+            IconButton(
+                onClick = {
+                    timeDialogState.show()
+                },
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .padding(4.dp),
+                    painter = painterResource(R.drawable.ic_watch),
+                    contentDescription = stringResource(id = R.string.icon_watch),
+                )
+            }
+        }
         FilledTonalButton(
             modifier = Modifier
                 .fillMaxWidth(),
             onClick = {
-                if (addAnalysisScreenUiState.nameErrorMessage == null &&
-                    addAnalysisScreenUiState.unitErrorMessage == null &&
-                    addAnalysisScreenUiState.resultErrorMessage == null &&
-                    addAnalysisScreenUiState.lowerLimitErrorMessage == null &&
-                    addAnalysisScreenUiState.upperLimitErrorMessage == null
+                if (addAppointmentUiState.doctorSpecialtyErrorMessage == null &&
+                    addAppointmentUiState.doctorNameErrorMessage == null &&
+                    addAppointmentUiState.addressErrorMessage == null
                 ) {
-                    viewModel.addAnalysis(analysisScreenViewModel.getAnalyzesSize())
+                    viewModel.addAppointment(appointmentViewModel.getAppointmentsSize())
                 } else {
                     Toast.makeText(
                         context,
@@ -260,13 +228,17 @@ fun AddAnalysisScreen(
     DateMaterialDialog(
         dateDialogState = dateDialogState,
         updateData = viewModel::updateDate,
-        isFutureDate = false,
+        isFutureDate = true,
+    )
+    TimeMaterialDialog(
+        timeDialogState = timeDialogState,
+        updateData = viewModel::updateTime,
     )
 
     LaunchedEffect(resultOfRequest) {
         when (resultOfRequest) {
             is ResultOfRequest.Success<Unit> -> {
-                navController.navigate(Screen.AnalysisScreen.route)
+                navController.navigate(Screen.AppointmentScreen.route)
             }
 
             is ResultOfRequest.Error -> {
@@ -280,4 +252,5 @@ fun AddAnalysisScreen(
             is ResultOfRequest.Loading -> {}
         }
     }
+
 }
